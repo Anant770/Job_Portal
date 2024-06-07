@@ -1,0 +1,48 @@
+﻿﻿@model Job_Portal.Models.JobDto
+@{
+    ViewBag.Title = "Edit";
+}
+
+<h2>Edit Job</h2>
+<form action="/Job/Update/@Model.JobId" method="POST">
+    <input type="hidden" name="JobId" value="@Model.JobId"/>
+    <div>
+        <label>Title:</label>
+        <input type="text" name="Title" value="@Model.Title" />
+    </div>
+    <div>
+        <label>Description:</label>
+        <input type="text" name="Description" value="@Model.Description" />
+    </div>
+    <div>
+        <label>Company:</label>
+        <select name="CompanyId">
+            <option value="">Select Company</option>
+            @foreach (var company in ViewBag.Companies)
+            {
+                <option value="@company.Value" @(company.Value == Model.CompanyId.ToString() ? "selected" : "")>@company.Text</option>
+            }
+        </select>
+    </div>
+    <div>
+        <label>Location:</label>
+        <input type="text" name="Location" value="@Model.Location" />
+    </div>
+    <div>
+        <label>Posted Date:</label>
+        <input type="date" name="PostedDate" value="@Model.PostedDate.ToString("yyyy-MM-dd")" />
+    </div>
+    <div>
+        <label>Job Category:</label>
+        <select name="JobCategoryId">
+            <option value="">Select Category</option>
+            @foreach (var category in ViewBag.JobCategories)
+            {
+                <option value="@category.Value" @(category.Value == Model.JobCategoryId.ToString() ? "selected" : "")>@category.Text</option>
+            }
+        </select>
+    </div>
+    <div>
+        <input type="submit" value="Update Job" />
+    </div>
+</form>

@@ -1,0 +1,46 @@
+﻿@{
+    ViewBag.Title = "Create";
+}
+
+<h2>Create Job</h2>
+<form action="/Job/Create" method="POST">
+    <div>
+        <label>Title:</label>
+        <input type="text" name="Title" />
+    </div>
+    <div>
+        <label>Description:</label>
+        <input type="text" name="Description" />
+    </div>
+    <div>
+        <label>Company:</label>
+        <select name="CompanyId">
+            <option value="">Select Company</option>
+            @foreach (var company in ViewBag.Companies)
+            {
+                <option value="@company.Value">@company.Text</option>
+            }
+        </select>
+    </div>
+    <div>
+        <label>Location:</label>
+        <input type="text" name="Location" />
+    </div>
+    <div>
+        <label>Posted Date:</label>
+        <input type="date" name="PostedDate" />
+    </div>
+    <div>
+        <label>Job Category:</label>
+        <select name="JobCategoryId">
+            <option value="">Select Category</option>
+            @foreach (var category in ViewBag.JobCategories)
+            {
+                <option value="@category.Value">@category.Text</option>
+            }
+        </select>
+    </div>
+    <div>
+        <input type="submit" value="Add Job" />
+    </div>
+</form>

@@ -1,0 +1,43 @@
+﻿@model IEnumerable<Job_Portal.Models.JobDto>
+
+@{
+    ViewBag.Title = "Job List";
+}
+
+<h2>Job List</h2>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Title</th>
+            <th>Description</th>
+            <th>Location</th>
+            <th>Posted Date</th>
+            <th>Company</th>
+            <th>Job Category</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+<p>
+    @Html.ActionLink("Create New Job", "New")
+</p>
+    <tbody>
+        @foreach (var job in Model)
+        {
+            <tr>
+                <td>@job.Title</td>
+                <td>@job.Description</td>
+                <td>@job.Location</td>
+                <td>@job.PostedDate.ToShortDateString()</td>
+                <td>@job.CompanyName</td>
+                <td>@job.JobCategoryName</td>
+                <td>
+                    @Html.ActionLink("Edit", "Edit", new { id = job.JobId }) |
+                    @Html.ActionLink("Details", "Details", new { id = job.JobId }) |
+                    @Html.ActionLink("Delete", "DeleteConfirm", new { id = job.JobId })
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
