@@ -36,10 +36,10 @@ and provides a web interface to interact with these resources.
 - **System Exception: Exception has been thrown by the target of an invocation:**
   - Clone the project repository to the local drive instead of cloud-based storage like OneDrive.
 
-- **Could not find part to the path ../bin/roslyn/csc.exe:**
+- **Could not find a part to the path ../bin/roslyn/csc.exe:**
   - Change the target framework to 4.7.1 and then back to 4.7.2 to resolve.
 
-- **Project Failed to build. System.Web.Http does not have reference to serialize...:**
+- **Project Failed to build. System.Web.Http does not have a reference to serialize...:**
   - Add a reference to System.Web.Extensions in Solution Explorer > References.
 
 ## Using the API
@@ -116,5 +116,10 @@ and provides a web interface to interact with these resources.
 
 - **Delete a Company:**
   ```bash
-  curl -d "" https://localhost:44320/api/CategoryData/DeleteCategory/{id}
+  curl -d "https://localhost:44320/api/CategoryData/DeleteCategory/{id}"
+
+##Database Relationships
+ - job: A recipe has many companies and many categories.
+ = company: Each company belongs to a job.
+ = category: Each category belongs to a job.
   
