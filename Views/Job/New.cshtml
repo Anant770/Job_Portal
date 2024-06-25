@@ -1,46 +1,54 @@
-﻿@{
-    ViewBag.Title = "Create";
+﻿@model Job_Portal.Models.JobDto
+
+@{
+    ViewBag.Title = "Create New Job";
 }
 
-<h2>Create Job</h2>
-<form action="/Job/Create" method="POST">
-    <div>
-        <label>Title:</label>
-        <input type="text" name="Title" />
-    </div>
-    <div>
-        <label>Description:</label>
-        <input type="text" name="Description" />
-    </div>
-    <div>
-        <label>Company:</label>
-        <select name="CompanyId">
-            <option value="">Select Company</option>
-            @foreach (var company in ViewBag.Companies)
-            {
-                <option value="@company.Value">@company.Text</option>
-            }
-        </select>
-    </div>
-    <div>
-        <label>Location:</label>
-        <input type="text" name="Location" />
-    </div>
-    <div>
-        <label>Posted Date:</label>
-        <input type="date" name="PostedDate" />
-    </div>
-    <div>
-        <label>Job Category:</label>
-        <select name="JobCategoryId">
-            <option value="">Select Category</option>
-            @foreach (var category in ViewBag.JobCategories)
-            {
-                <option value="@category.Value">@category.Text</option>
-            }
-        </select>
-    </div>
-    <div>
-        <input type="submit" value="Add Job" />
-    </div>
-</form>
+<link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet" />
+
+<div class="container mt-5">
+    <h2 class="mb-4 text-center">@ViewBag.Title</h2>
+
+    <form action="/Job/Create" method="POST">
+        <div class="form-group">
+            <label for="Title">Title:</label>
+            <input type="text" class="form-control" name="Title" id="Title" required />
+        </div>
+        <div class="form-group">
+            <label for="Description">Description:</label>
+            <input type="text" class="form-control" name="Description" id="Description" required />
+        </div>
+        <div class="form-group">
+            <label for="CompanyId">Company:</label>
+            <select class="form-control" name="CompanyId" id="CompanyId" required>
+                <option value="">Select Company</option>
+                @foreach (var company in ViewBag.Companies)
+                {
+                    <option value="@company.Value">@company.Text</option>
+                }
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="Location">Location:</label>
+            <input type="text" class="form-control" name="Location" id="Location" required />
+        </div>
+        <div class="form-group">
+            <label for="PostedDate">Posted Date:</label>
+            <input type="date" class="form-control" name="PostedDate" id="PostedDate" required />
+        </div>
+        <div class="form-group">
+            <label for="JobCategoryId">Job Category:</label>
+            <select class="form-control" name="JobCategoryId" id="JobCategoryId" required>
+                <option value="">Select Category</option>
+                @foreach (var category in ViewBag.JobCategories)
+                {
+                    <option value="@category.Value">@category.Text</option>
+                }
+            </select>
+        </div>
+        <button type="submit" class="btn btn-primary">Create Job</button>
+    </form>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>

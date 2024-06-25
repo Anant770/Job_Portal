@@ -14,15 +14,12 @@ namespace Job_Portal.Models
         /// </summary>
         [Key]
         public int JobCategoryId { get; set; }
-
-        /// <summary>
-        /// Gets or sets the name of the job category.
-        /// </summary>
         public string Name { get; set; }
-
-        /// <summary>
-        /// Gets or sets the collection of jobs that belong to this category.
-        /// </summary>
         public virtual ICollection<Job> Jobs { get; set; }
+    }
+    public class CategoryDto
+    {
+        public int JobCategoryId { get; set; }
+        public string Name { get; set; }
     }
 }

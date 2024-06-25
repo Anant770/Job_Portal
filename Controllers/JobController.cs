@@ -10,6 +10,9 @@ using System.Web.Script.Serialization;
 
 namespace Job_Portal.Controllers
 {
+    /// <summary>
+    /// The JobController class handles the web-based interactions with job data, including CRUD operations.
+    /// </summary>
     public class JobController : Controller
     {
         private static readonly HttpClient client;
@@ -17,59 +20,103 @@ namespace Job_Portal.Controllers
 
         static JobController()
         {
-            client = new HttpClient();
+            HttpClientHandler handler = new HttpClientHandler()
+            {
+                AllowAutoRedirect = false,
+                //cookies are manually set in RequestHeader
+                UseCookies = false
+            };
+
+            client = new HttpClient(handler);
             client.BaseAddress = new Uri("https://localhost:44320/api/jobdata/");
         }
 
-        // GET: Job/List
+        /// <summary>
+        /// Displays a list of all jobs.
+        /// </summary>
+        /// <returns>A view containing a list of JobDto objects.</returns>
+        /// <example>
+        /// GET: Job/List
+        /// </example>
         public ActionResult List()
         {
-            //objective: communicate with our job data api to retrieve a list of jobs
-            //curl https://localhost:44324/api/jobdata/listjobs
-
-
             string url = "listjobs";
             HttpResponseMessage response = client.GetAsync(url).Result;
 
-            //Debug.WriteLine("The response code is ");
-            //Debug.WriteLine(response.StatusCode);
-
             IEnumerable<JobDto> jobs = response.Content.ReadAsAsync<IEnumerable<JobDto>>().Result;
-            //Debug.WriteLine("Number of jobs received : ");
-            //Debug.WriteLine(jobs.Count());
-
 
             return View(jobs);
         }
 
-        // GET: Job/Details/5
+        /// <summary>
+        /// Displays details of a specific job.
+        /// </summary>
+        /// <param name="id">The ID of the job to display.</param>
+        /// <returns>A view containing the details of the specified job.</returns>
+        /// <example>
+        /// GET: Job/Details/5
+        /// </example>
         public ActionResult Details(int id)
         {
-            //objective: communicate with our job data api to retrieve one job
-            //curl https://localhost:44324/api/jobdata/findjob/{id}
-
             string url = "findjob/" + id;
             HttpResponseMessage response = client.GetAsync(url).Result;
 
-            Debug.WriteLine("The response code is ");
-            Debug.WriteLine(response.StatusCode);
-
-            JobDto selectedjob = response.Content.ReadAsAsync<JobDto>().Result;
-            Debug.WriteLine("job received : ");
-            Debug.WriteLine(selectedjob.Description);
-
-
-            return View(selectedjob);
+            if (response.IsSuccessStatusCode)
+            {
+                JobDto selectedJob = response.Content.ReadAsAsync<JobDto>().Result;
+                return View(selectedJob);
+            }
+            else
+            {
+                return RedirectToAction("Error");
+            }
         }
 
+        /// <summary>
+        /// Displays an error page.
+        /// </summary>
+        /// <returns>An error view.</returns>
         public ActionResult Error()
         {
-
             return View();
         }
+        /// <summary>
+        /// Grabs the authentication cookie sent to this controller.
+        /// For proper WebAPI authentication, you can send a post request with login credentials to the WebAPI and log the access token from the response. The controller already knows this token, so we're just passing it up the chain.
+        /// 
+        /// Here is a descriptive article which walks through the process of setting up authorization/authentication directly.
+        /// https://docs.microsoft.com/en-us/aspnet/web-api/overview/security/individual-accounts-in-web-api
+        /// </summary>
+        private void GetApplicationCookie()
+        {
+            string token = "";
+            //HTTP client is set up to be reused, otherwise it will exhaust server resources.
+            //This is a bit dangerous because a previously authenticated cookie could be cached for
+            //a follow-up request from someone else. Reset cookies in HTTP client before grabbing a new one.
+            client.DefaultRequestHeaders.Remove("Cookie");
+            if (!User.Identity.IsAuthenticated) return;
 
-        // GET: Job/New
+            HttpCookie cookie = System.Web.HttpContext.Current.Request.Cookies.Get(".AspNet.ApplicationCookie");
+            if (cookie != null) token = cookie.Value;
+
+            //collect token as it is submitted to the controller
+            //use it to pass along to the WebAPI.
+            Debug.WriteLine("Token Submitted is : " + token);
+            if (token != "") client.DefaultRequestHeaders.Add("Cookie", ".AspNet.ApplicationCookie=" + token);
+
+            return;
+        }
+
+        /// <summary>
+        /// Displays a form to create a new job.
+        /// </summary>
+        /// <returns>A view containing the form to create a new job.</returns>
+        /// <example>
+        /// GET: Job/New
+        /// </example>
+
         private ApplicationDbContext db = new ApplicationDbContext();
+        [Authorize]
         public ActionResult New()
         {
             ViewBag.Companies = new SelectList(db.Companies, "CompanyId", "Name");
@@ -78,16 +125,21 @@ namespace Job_Portal.Controllers
             return View();
         }
 
-        // POST: Job/Create
+        /// <summary>
+        /// Creates a new job in the database.
+        /// </summary>
+        /// <param name="job">The job object to create.</param>
+        /// <returns>Redirects to the list of jobs if successful, otherwise redirects to the error page.</returns>
+        /// <example>
+        /// POST: Job/Create
+        /// </example>
         [HttpPost]
+        [Authorize]
         public ActionResult Create(Job job)
         {
-            Debug.WriteLine("The JSON payload is:");
+            GetApplicationCookie();//get token credentials
             string url = "addjob";
-
             string jsonpayload = jss.Serialize(job);
-
-            Debug.WriteLine(jsonpayload);
 
             HttpContent content = new StringContent(jsonpayload);
             content.Headers.ContentType.MediaType = "application/json";
@@ -103,9 +155,18 @@ namespace Job_Portal.Controllers
             }
         }
 
-        // GET: Job/Edit/5
+        /// <summary>
+        /// Displays a form to edit an existing job.
+        /// </summary>
+        /// <param name="id">The ID of the job to edit.</param>
+        /// <returns>A view containing the form to edit the specified job.</returns>
+        /// <example>
+        /// GET: Job/Edit/5
+        /// </example>
+        [Authorize]
         public ActionResult Edit(int id)
         {
+            GetApplicationCookie();//get token credentials
             string url = "findjob/" + id;
             HttpResponseMessage response = client.GetAsync(url).Result;
 
@@ -122,20 +183,24 @@ namespace Job_Portal.Controllers
             }
         }
 
-        // POST: Job/Update/5
+        /// <summary>
+        /// Updates an existing job in the database.
+        /// </summary>
+        /// <param name="id">The ID of the job to update.</param>
+        /// <param name="job">The job object containing updated information.</param>
+        /// <returns>Redirects to the job details if successful, otherwise redirects to the error page.</returns>
+        /// <example>
+        /// POST: Job/Update/5
+        /// </example>
         [HttpPost]
+        [Authorize]
         public ActionResult Update(int id, Job job)
         {
+            GetApplicationCookie();//get token credentials
             try
             {
-                Debug.WriteLine("The new job info is:");
-                Debug.WriteLine(job.JobId);
-                Debug.WriteLine(job.Description);
-
                 string url = "UpdateJob/" + id;
-
                 string jsonpayload = jss.Serialize(job);
-                Debug.WriteLine(jsonpayload);
 
                 HttpContent content = new StringContent(jsonpayload);
                 content.Headers.ContentType.MediaType = "application/json";
@@ -157,10 +222,18 @@ namespace Job_Portal.Controllers
             }
         }
 
-
-        // GET: Job/DeleteConfirm/5
+        /// <summary>
+        /// Displays a confirmation page for deleting a job.
+        /// </summary>
+        /// <param name="id">The ID of the job to delete.</param>
+        /// <returns>A view containing the confirmation page for deleting the specified job.</returns>
+        /// <example>
+        /// GET: Job/DeleteConfirm/5
+        /// </example>
+        [Authorize]
         public ActionResult DeleteConfirm(int id)
         {
+            GetApplicationCookie();//get token credentials
             string url = "findjob/" + id;
             HttpResponseMessage response = client.GetAsync(url).Result;
 
@@ -174,10 +247,20 @@ namespace Job_Portal.Controllers
                 return RedirectToAction("Error");
             }
         }
-        // POST: Job/Delete/5
+
+        /// <summary>
+        /// Deletes a job from the database.
+        /// </summary>
+        /// <param name="id">The ID of the job to delete.</param>
+        /// <returns>Redirects to the list of jobs if successful, otherwise redirects to the error page.</returns>
+        /// <example>
+        /// POST: Job/Delete/5
+        /// </example>
         [HttpPost]
+        [Authorize]
         public ActionResult Delete(int id)
         {
+            GetApplicationCookie();//get token credentials
             string url = "deletejob/" + id;
             HttpResponseMessage response = client.PostAsync(url, null).Result;
 

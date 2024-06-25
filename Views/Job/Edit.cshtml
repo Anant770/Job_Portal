@@ -1,48 +1,55 @@
-﻿﻿@model Job_Portal.Models.JobDto
+﻿@model Job_Portal.Models.JobDto
+
 @{
-    ViewBag.Title = "Edit";
+    ViewBag.Title = "Edit Job";
 }
 
-<h2>Edit Job</h2>
-<form action="/Job/Update/@Model.JobId" method="POST">
-    <input type="hidden" name="JobId" value="@Model.JobId"/>
-    <div>
-        <label>Title:</label>
-        <input type="text" name="Title" value="@Model.Title" />
-    </div>
-    <div>
-        <label>Description:</label>
-        <input type="text" name="Description" value="@Model.Description" />
-    </div>
-    <div>
-        <label>Company:</label>
-        <select name="CompanyId">
-            <option value="">Select Company</option>
-            @foreach (var company in ViewBag.Companies)
-            {
-                <option value="@company.Value" @(company.Value == Model.CompanyId.ToString() ? "selected" : "")>@company.Text</option>
-            }
-        </select>
-    </div>
-    <div>
-        <label>Location:</label>
-        <input type="text" name="Location" value="@Model.Location" />
-    </div>
-    <div>
-        <label>Posted Date:</label>
-        <input type="date" name="PostedDate" value="@Model.PostedDate.ToString("yyyy-MM-dd")" />
-    </div>
-    <div>
-        <label>Job Category:</label>
-        <select name="JobCategoryId">
-            <option value="">Select Category</option>
-            @foreach (var category in ViewBag.JobCategories)
-            {
-                <option value="@category.Value" @(category.Value == Model.JobCategoryId.ToString() ? "selected" : "")>@category.Text</option>
-            }
-        </select>
-    </div>
-    <div>
-        <input type="submit" value="Update Job" />
-    </div>
-</form>
+<link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet" />
+
+<div class="container mt-5">
+    <h2 class="mb-4 text-center">@ViewBag.Title</h2>
+
+    <form action="/Job/Update/@Model.JobId" method="POST">
+        <input type="hidden" name="JobId" value="@Model.JobId" />
+        <div class="form-group">
+            <label for="Title">Title:</label>
+            <input type="text" class="form-control" name="Title" id="Title" value="@Model.Title" required />
+        </div>
+        <div class="form-group">
+            <label for="Description">Description:</label>
+            <input type="text" class="form-control" name="Description" id="Description" value="@Model.Description" required />
+        </div>
+        <div class="form-group">
+            <label for="CompanyId">Company:</label>
+            <select class="form-control" name="CompanyId" id="CompanyId" required>
+                <option value="">Select Company</option>
+                @foreach (var company in ViewBag.Companies)
+                {
+                    <option value="@company.Value" @(company.Value == Model.CompanyId.ToString() ? "selected" : "")>@company.Text</option>
+                }
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="Location">Location:</label>
+            <input type="text" class="form-control" name="Location" id="Location" value="@Model.Location" required />
+        </div>
+        <div class="form-group">
+            <label for="PostedDate">Posted Date:</label>
+            <input type="date" class="form-control" name="PostedDate" id="PostedDate" value="@Model.PostedDate.ToString("yyyy-MM-dd")" required />
+        </div>
+        <div class="form-group">
+            <label for="JobCategoryId">Job Category:</label>
+            <select class="form-control" name="JobCategoryId" id="JobCategoryId" required>
+                <option value="">Select Category</option>
+                @foreach (var category in ViewBag.JobCategories)
+                {
+                    <option value="@category.Value" @(category.Value == Model.JobCategoryId.ToString() ? "selected" : "")>@category.Text</option>
+                }
+            </select>
+        </div>
+        <button type="submit" class="btn btn-primary">Update Job</button>
+    </form>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>

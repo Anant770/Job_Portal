@@ -30,4 +30,10 @@ namespace Job_Portal.Models
         public ICollection<Job> Jobs { get; set; }
 
     }
+    public class CompanyDto
+    {
+        public int CompanyId { get; set; }
+        public string Name { get; set; }
+        public string Address { get; set; }
+    }
 }
